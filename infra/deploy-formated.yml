@@ -1,0 +1,29 @@
+jobs:
+- name: maven-package
+  plan:
+  - get: fagito-repo
+    trigger: true
+  - config:
+      container_limits: {}
+      image_resource:
+        source:
+          repository: hub.docker.com/maven:3.5.2-jdk-8
+        type: docker-image
+      inputs:
+      - name: fagito-repo
+      platform: linux
+      run:
+        args:
+        - -f
+        - fagito-repo/fagito/pom.xml
+        - -DskipTests=true
+        - package
+        path: mvn
+    privileged: true
+    task: maven-package
+resources:
+- name: fagito-repo
+  source:
+    branch: master
+    uri: https://github.com/hossanrose/fagito.git
+  type: git
