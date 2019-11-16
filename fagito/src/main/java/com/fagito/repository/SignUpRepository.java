@@ -18,4 +18,7 @@ public interface SignUpRepository extends JpaRepository<SignUp,String>{
 	
 	@Query(value="SELECT s.sign_up_id FROM sign_up s ORDER BY s.sign_up_id DESC LIMIT 1",nativeQuery=true)
 	String findLastRecord();
+	
+	@Query(value="SELECT s.user_id FROM sign_up s where s.email = :email and s.password= :password",nativeQuery=true)	 
+	String getByEmail(@Param("email") String email,@Param("password") String password);
 }

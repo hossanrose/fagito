@@ -53,7 +53,6 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 		Iterator<Restaurant> restaurant_iterator;
 		
 		
-		System.out.println(food_form_ui.getFood_name().toLowerCase());
 		List<Food> food_list=foodRepository.findByName(food_form_ui.getFood_name().toLowerCase());
 
 		if(food_list!=null)
@@ -67,14 +66,9 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 			menu_list=this.getMenuList(food_list);
 			restaurant_list=this.getRestaurantList(menu_list);
 		}
-		System.out.println(food_list);
-		System.out.println(menu_list);
-		System.out.println(restaurant_list);
 		restaurant_list=get_restaurant_with_distance(restaurant_list,food_form_ui.getLatitude(),food_form_ui.getLongitude(),distance);
-		
+		int i;
 		food_iterator=food_list.iterator();
-		menu_iterator=menu_list.iterator();
-		restaurant_iterator=restaurant_list.iterator();
 		
 		while(food_iterator.hasNext())
 		{
@@ -82,7 +76,8 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 			Food food_object=food_iterator.next();
 			
 			menu_id=(String)food_object.getMenu_id();
-			
+			menu_iterator=menu_list.iterator();
+			restaurant_iterator=restaurant_list.iterator();	
 			while(menu_iterator.hasNext())
 			{
 				Menu menu_object=menu_iterator.next();
@@ -96,9 +91,11 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 						Restaurant restaurant_object=restaurant_iterator.next();
 						if(restaurant_object.getRestaurant_id().equals(restaurant_id))
 						{
-							food_form_object.setResteraunt_name(restaurant_object.getRestaurant_name());;
+							food_form_object.setRestaurant_id(restaurant_object.getRestaurant_id());
+							food_form_object.setFood_id(food_object.getFood_id());
+							food_form_object.setRestaurant_name(restaurant_object.getRestaurant_name());;
 							food_form_object.setFood_name(food_object.getFood_name());
-							food_form_object.setTime(restaurant_object.getOpening_time()+"-"+restaurant_object.getClosing_time());
+							food_form_object.setTime(restaurant_object.getOpening_time().getHours()+"-"+(restaurant_object.getClosing_time().getHours()-12));
 							//System.out.print(restaurantrecordRepository.findIsGold(restaurant_object.getRestaurant_id()));
 							is_gold=restaurantrecordRepository.getIsGold(restaurant_object.getRestaurant_id());
 							if(is_gold)
@@ -114,7 +111,6 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 							{
 								food_form_object.setOpenorclose("Close");
 							}
-							
 							food_form_object.setDistance(distance_map.get(restaurant_object.getRestaurant_id()));
 							food_form.add(food_form_object);
 						}
@@ -123,18 +119,19 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 			}	
 		}
 		return food_form;
-		
-		
 	}
 	
 	public List<Menu> getMenuList(List<Food> food_list)
 	{
 		List<Menu> menu_list=new ArrayList<Menu>();
-		
+		Food food_object=null;
 		Iterator<Food> food_iterate=food_list.iterator();
 		while(food_iterate.hasNext())
 		{
-			menu_list.add(menuRepository.findByMenuId(food_iterate.next().getMenu_id()));
+			food_object=food_iterate.next();
+			Menu menu_object=menuRepository.findByMenuId(food_object.getMenu_id());
+			if(!menu_list.contains(menu_object))
+				menu_list.add(menu_object);
 		}
 		return menu_list;
 	}
@@ -163,7 +160,7 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 			Restaurant restaurant_object=restaurant_iterator.next();
 			restaurantRecord=restaurantrecordRepository.findRestaurantRecord(restaurant_object.getRestaurant_id());
 			actual_distance=get_the_distance(latitude,longitude,restaurantRecord.getLatitude(),restaurantRecord.getLongitude());
-			if((int)actual_distance>distance)
+			if((int)actual_distance<=distance)
 			{
 				restaurant_new_list.add(restaurant_object);
 				distance_map.put(restaurant_object.getRestaurant_id(),(float)distance);
@@ -185,6 +182,7 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 			dist = dist * 1.609344;
 			return dist;
 		}
+		
 	}
 }
 	

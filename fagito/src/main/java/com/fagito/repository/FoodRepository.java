@@ -13,6 +13,7 @@ import com.fagito.model.Food;
 @Repository
 public interface FoodRepository extends JpaRepository<Food,String>{
 	
-	@Query(value="SELECT * FROM food f where f.food_name like '%Pizza%'",nativeQuery=true)
+	@Query(value="SELECT * FROM food f where lower(f.food_name) like %:food_name% ",nativeQuery=true)
 	List<Food> findByName(@Param("food_name") String food_name);
+	
 }

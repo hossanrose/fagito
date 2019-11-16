@@ -122,7 +122,6 @@ public class UserService
 		signupRepository.save(signup_model);
 		return successRegister;
 	}
-	
 	public int getUserByEmail(String email,String password)
 	{
 		
@@ -130,14 +129,14 @@ public class UserService
 		
 		return exsist_result;
 	}
-	public String verifyUser(LoginDTO loginDTO)
+	public String verifyUser(LoginDTO loginDTO) throws Exception
 	{
-		int exsist_user=this.getUserByEmail(loginDTO.getEmail(),loginDTO.getPassword());
-		if(exsist_user!=1)
+		String exsist_user=signupRepository.getByEmail(loginDTO.getEmail(),loginDTO.getPassword());
+		if(exsist_user!=null)
 		{
-				return successLogin; 
+				return exsist_user; 
 		}
-		return wrong;
+		throw new Exception(wrong);
 	}
 		
 }	

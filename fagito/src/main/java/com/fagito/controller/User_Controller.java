@@ -10,6 +10,7 @@ import com.fagito.view.LoginForm;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,23 +27,30 @@ public class User_Controller{
     @PostMapping
     public String addUser(@RequestBody CustomerForm customerForm){
     	System.out.print("hi inside spring boot");
-    	String result;
     	CustomerDTO customerDTO=new CustomerDTO();
     	SignUpDTO signupDTO=new SignUpDTO();
     	BeanUtils.copyProperties(customerForm, customerDTO);
     	BeanUtils.copyProperties(customerForm, signupDTO);
-    	result=userService.addUser(customerDTO,signupDTO);
-	    return result;
+    	return userService.addUser(customerDTO,signupDTO);
 	    
     }
     
-   /*@GetMapping
-    public String verifyUser(@RequestBody LoginForm loginForm)
+   @PostMapping("/login")
+    public ResponseEntity<?> verifyUser(@RequestBody LoginForm loginForm)
     {
-    	String result;
-    	LoginDTO loginDTO=new LoginDTO();
-    	BeanUtils.copyProperties(loginForm, loginDTO);
-    	result=userService.verifyUser(loginDTO);
-    	return result;
-    }*/
+    	try
+    	{
+    		System.out.println("Inside Login Service");
+    		String exsist_user;
+	    	LoginDTO loginDTO=new LoginDTO();
+	    	BeanUtils.copyProperties(loginForm, loginDTO);
+	    	exsist_user = userService.verifyUser(loginDTO);
+	    	System.out.println(exsist_user);
+	    	return ResponseEntity.ok().body(exsist_user);
+	    }
+    	catch(Exception e)
+    	{
+    		return ResponseEntity.status(500).body(e.getMessage());
+    	}
+    }
 }
