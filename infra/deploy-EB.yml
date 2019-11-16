@@ -1,0 +1,74 @@
+resources:  
+  - name: fagito-repo 
+    type: git  
+    source:  
+      uri: https://github.com/hossanrose/fagito.git
+      branch: master
+  - name: storage
+    type: s3
+    source:
+      # Name of the bucket in S3 account
+      bucket: fagito-repo
+      versioned_file: demo.jar
+      # AWS Credentials are passed in command line on set-pipeline. Concourse can also use an external vault system to store credentials
+      access_key_id: ((AWS_ACCESS_KEY_ID))
+      secret_access_key: ((AWS_SECRET_ACCESS_KEY))
+jobs:  
+  # First job: Package Application as a JAR and Upload to S3 Bucket for storage
+  - name: Build  
+    plan:  
+    - get: fagito-repo  
+      trigger: true  
+    - task: build  
+      config:
+        # Use a docker image with Maven to build application
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: maven
+        inputs:
+          - name: fagito-repo
+        outputs: 
+          - name: build
+        caches:
+          - path: code/.m2
+        run:
+          path: sh
+          args:
+          - -c
+          - |
+            mvn -f fagito-repo/fagito/pom.xml package -DskipTests=true
+            cp fagito-repo/fagito/target/demo-0.0.1-SNAPSHOT.jar build/demo.jar
+    - put: storage
+      params:
+        file: build/demo.jar
+        name: demo.jar
+  # Second job: Retrieve application from S3 Bucket and Deploy to AWS Beanstalk
+  - name: Deploy
+    plan:  
+    - get: storage
+      passed:
+        - Build
+      trigger: true
+    - task: deploy-aws  
+      params:
+        AWS_ACCESS_KEY_ID: ((AWS_ACCESS_KEY_ID))
+        AWS_SECRET_ACCESS_KEY: ((AWS_SECRET_ACCESS_KEY))
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: chriscamicas/awscli-awsebcli
+        inputs:
+          - name: storage
+        run:
+          path: sh
+          args:
+          - -c
+          - |
+            eb init continuous-deployment-demo -p "64bit Amazon Linux 2018.03 v2.10.0 running Java 8" --region "us-east-2"
+            eb create concourse-env --single
+            eb deploy concourse-env
+            eb status
