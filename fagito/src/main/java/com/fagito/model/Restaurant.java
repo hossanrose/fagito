@@ -16,6 +16,22 @@ public class Restaurant {
 	private String restaurant_name;
 	private Timestamp opening_time;
 	private Timestamp closing_time;
+	private int student_discount;
+	private int general_discount;
+	
+	
+	public int getStudent_discount() {
+		return student_discount;
+	}
+	public void setStudent_discount(int student_discount) {
+		this.student_discount = student_discount;
+	}
+	public int getGeneral_discount() {
+		return general_discount;
+	}
+	public void setGeneral_discount(int general_discount) {
+		this.general_discount = general_discount;
+	}
 	private String days;
 	public String getRestaurant_id() {
 		return restaurant_id;

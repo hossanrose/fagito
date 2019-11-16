@@ -2,13 +2,27 @@ package com.fagito.view;
 
 public class Food_Form {
 	
-	private String resteraunt_name;
+	private String restaurant_id;
+	private String food_id;
+	private String restaurant_name;
 	private String food_name;
 	private float distance;
 	private String openorclose;
 	private String time;
 	private int is_gold;
 	
+	public String getRestaurant_id() {
+		return restaurant_id;
+	}
+	public void setRestaurant_id(String restaurant_id) {
+		this.restaurant_id = restaurant_id;
+	}
+	public String getFood_id() {
+		return food_id;
+	}
+	public void setFood_id(String food_id) {
+		this.food_id = food_id;
+	}
 	public String getFood_name() {
 		return food_name;
 	}
@@ -28,11 +42,12 @@ public class Food_Form {
 	public void setTime(String time) {
 		this.time = time;
 	}
-	public String getResteraunt_name() {
-		return resteraunt_name;
+	
+	public String getRestaurant_name() {
+		return restaurant_name;
 	}
-	public void setResteraunt_name(String resteraunt_name) {
-		this.resteraunt_name = resteraunt_name;
+	public void setRestaurant_name(String restaurant_name) {
+		this.restaurant_name = restaurant_name;
 	}
 	public float getDistance() {
 		return distance;
