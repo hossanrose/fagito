@@ -1,0 +1,15 @@
+<router-outlet></router-outlet>
+<p>sign-up-page</p>
+<nav>
+    <a routerLink="/Login">Login</a>
+</nav>
+<form> 
+    <input type="text" placeholder="CUSTOMER NAME"  [(ngModel)]="customer_name" name="customer_name"/><br><br>
+    <input type="password" placeholder="PASSWORD"  [(ngModel)]="password" name="password"/><br><br>
+    <input type="email" placeholder="email"  [(ngModel)]="email" name="email"/><br><br>
+    <input type="submit" (click)="onClick()"/> 
+</form>
+
+
+    
+    
