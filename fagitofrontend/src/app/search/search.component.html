@@ -1,0 +1,36 @@
+<header>
+    <h1>Fagito</h1><br><br>
+    <div class="welcome_user_block">
+      Welcome <span class="logged_in_user">User</span><br>
+      <span class="logout_option">Logout {{this.id}}</span>
+    </div>
+  </header>
+  <div class="home_content">
+      <div class="search_form_block">
+        <form class="search_form" action="">
+               <input type="text" id="search_text" name="search_text" placeholder="What would you like to eat today?" [(ngModel)]="food_name" name="food_name">&nbsp;
+               <input type="submit" name="find_food" value="Find Food" (click)="find()">&nbsp;
+               <input type="submit" name="surprise_me" value="Surprise Me">
+        </form>
+      </div>
+  </div>
+  <div class="results_content">
+      <div class="results_block">
+        <h2>Search results</h2>
+        <div class="item" style="background-color:green;" *ngFor="let list of food_search_result">
+           <div class="item_image" style="background-image: url('pb.jpg');width: 50px;height: 50px;">
+           </div>
+           <div class="item_text" >
+             <div>{{list.food_name}}</div>
+             <div (click)="find_details(list.food_id,list.restaurant_id)"><a>{{list.restaurant_name}}</a></div>
+             <div>{{list.distance}}</div>
+             <div>{{list.openorclose}}</div>&nbsp;
+             <div>{{list.time}}</div>&nbsp;
+             <div *ngIf="list.is_gold==1">Gold option Available</div>
+  
+           </div>
+       </div>
+      </div>
+  </div>
+       
+     
