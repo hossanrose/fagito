@@ -1,16 +1,18 @@
 package com.fagito.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import com.fagito.dto.CustomerDTO;
 import com.fagito.dto.LoginDTO;
 import com.fagito.dto.SignUpDTO;
@@ -21,10 +23,11 @@ import com.fagito.repository.CustomerRepository;
 import com.fagito.repository.SignUpRepository;
 import com.fagito.repository.StudentMailRepository;
 import com.fagito.validator.UserValidator;
+import com.fagito.view.Login_Output_to_Ui;
 
 @Service
 @PropertySource("application.properties")
-public class UserService
+public class UserService implements UserServiceInterface
 {
 	@Value("${spring.user.already_exsist}")
 	String errorRegister;
@@ -42,18 +45,21 @@ public class UserService
 	private StudentMailRepository studentmailRepository;
 	@Autowired
 	private UserValidator userValidator;
-	/*@Autowired
-	public UserService(UserValidator userValidator,CustomerRepository customerRepository,StudentMailRepository studentmailRepository,SignUpRepository signupRepository)
-	{
-		this.userValidator=userValidator;
-		this.customerRepository=customerRepository;
-		this.studentmailRepository=studentmailRepository;
-		this.signupRepository=signupRepository;
-	}*/
 	
+	public UserDetails getuserbyemail(String emailid) {
+	SignUp user=signupRepository.getUserByEmailid(emailid);
+	User Usedetails=null;
+	if(user !=null) {
+		ArrayList<GrantedAuthority> Authority= new ArrayList<>();
+		Usedetails=new User(user.getEmail(),user.getPassword(),Authority);
+		
+	}else {
+		throw new UsernameNotFoundException("No user found in the system");
+	}
+	return Usedetails;
+	}
 	public String addUser(CustomerDTO customerDTO,SignUpDTO signupDTO)
 	{
-		System.out.print("I am in swrvice");
 		Customer customer_model=new Customer();
 		SignUp signup_model=new SignUp();
 		List<Student_mail> mail_list;
@@ -67,13 +73,13 @@ public class UserService
 		{
 			return result;
 		}
-		//check for exisisting user
+		//check for existing user
 		int exisiting_user=this.getUserByEmail(signupDTO.getEmail(),signupDTO.getPassword());
 		if(exisiting_user==1)
 		{
 			return errorRegister;
 		}
-		
+		//checking for student mail or not
 		mail_list=studentmailRepository.findAll();
 		Pattern p = Pattern.compile("(.*)@(.*)[.](.*)[.](.*)");
 		Matcher m = p.matcher(signupDTO.getEmail());
@@ -91,26 +97,28 @@ public class UserService
 		}
 		if(user_reference==null)
         	user_reference="C";
-		System.out.println("I am in swrvice 1111"+user_reference);
-		String reference_id_string=customerRepository.findLastRecord();
+		
+		//setting up values to customer and signup model
+		String reference_id_string=customerRepository.findLastRecord(user_reference);
 		
 		if(reference_id_string!=null)
 			reference_id=Integer.parseInt(reference_id_string.substring(1));
 		else
 			reference_id=99;
 		
-		System.out.println(reference_id);
 		
 		String sign_up_id_string=signupRepository.findLastRecord();
 		if(sign_up_id_string!=null)
 			sign_up_id=Integer.parseInt(sign_up_id_string.substring(2));
 		else
 			sign_up_id=99;
-		System.out.println(sign_up_id);
+
 		customerDTO.setCustomer_id(user_reference+String.valueOf(reference_id+1));
 		customerDTO.setIs_gold(0);
-		
 		BeanUtils.copyProperties(customerDTO, customer_model);
+		customer_model.setUsertype(user_reference);
+		customer_model.setValidity(null);
+		
 		
 		signupDTO.setSign_up_id("SU"+String.valueOf(sign_up_id+1));
 		signupDTO.setUser_id(customerDTO.getCustomer_id());
@@ -122,6 +130,7 @@ public class UserService
 		signupRepository.save(signup_model);
 		return successRegister;
 	}
+	
 	public int getUserByEmail(String email,String password)
 	{
 		
@@ -129,12 +138,16 @@ public class UserService
 		
 		return exsist_result;
 	}
-	public String verifyUser(LoginDTO loginDTO) throws Exception
+	public Login_Output_to_Ui verifyUser(LoginDTO loginDTO) throws Exception
 	{
-		String exsist_user=signupRepository.getByEmail(loginDTO.getEmail(),loginDTO.getPassword());
+		Login_Output_to_Ui login_out=new Login_Output_to_Ui();
+		SignUp exsist_user=signupRepository.getByEmail(loginDTO.getEmail(),loginDTO.getPassword());
 		if(exsist_user!=null)
 		{
-				return exsist_user; 
+			String name=customerRepository.findNameByCustomerId(exsist_user.getUser_id());
+			login_out.setCustomer_id(exsist_user.getUser_id());
+			login_out.setCustomer_name(name);
+			return login_out; 
 		}
 		throw new Exception(wrong);
 	}

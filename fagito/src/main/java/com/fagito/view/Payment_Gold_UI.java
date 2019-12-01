@@ -5,13 +5,7 @@ public class Payment_Gold_UI {
 	private String customer_id;
 	private String pay_result;
 	private int months;
-	private int subscribe;
-	public int getSubscribe() {
-		return subscribe;
-	}
-	public void setSubscribe(int subscribe) {
-		this.subscribe = subscribe;
-	}
+
 	public String getCustomer_id() {
 		return customer_id;
 	}
