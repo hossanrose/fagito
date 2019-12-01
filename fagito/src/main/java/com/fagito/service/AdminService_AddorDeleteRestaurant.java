@@ -1,4 +1,4 @@
-ackage com.fagito.service;
+package com.fagito.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
