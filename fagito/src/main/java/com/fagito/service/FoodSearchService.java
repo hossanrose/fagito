@@ -1,18 +1,15 @@
 package com.fagito.service;
 
-import java.sql.Date;
+
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.fagito.model.Food;
 import com.fagito.model.Menu;
 import com.fagito.model.Restaurant;
@@ -21,6 +18,8 @@ import com.fagito.repository.FoodRepository;
 import com.fagito.repository.MenuRepository;
 import com.fagito.repository.RestaurantRecordRepository;
 import com.fagito.repository.RestaurantRepository;
+import com.fagito.service.iterator.IteratorInterface;
+import com.fagito.service.iterator.Repository;
 import com.fagito.view.Food_Form;
 import com.fagito.view.Food_Form_UI;
 
@@ -38,24 +37,29 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 	
 	Map<String,Float>distance_map=new HashMap<String,Float>();
 	
+	
+	
 	@SuppressWarnings("deprecation")
-	public List<Food_Form> foodSearch(Food_Form_UI food_form_ui)
+	public List<Food_Form> foodSearch(Food_Form_UI food_form_ui) throws Exception 
 	{
-		int distance=10;
+		int distance=10,i;
 		boolean is_gold;
 		String restaurant_id,menu_id;
 		List<Food_Form> food_form=new ArrayList<Food_Form>();
 		List<Menu> menu_list=null;
 		List<Restaurant> restaurant_list=null;
 		
-		Iterator<Food> food_iterator;
-		Iterator<Menu> menu_iterator;
-		Iterator<Restaurant> restaurant_iterator;
+		List<String> list = Arrays.asList("1","2","3","4","5","6","7","8","9","0");
+		String string = food_form_ui.getFood_name();
+		boolean match = list.stream().anyMatch(string::contains);
+		if(match)
+			throw new Exception();
+		  
 		
 		
 		List<Food> food_list=foodRepository.findByName(food_form_ui.getFood_name().toLowerCase());
-
-		if(food_list!=null)
+		
+		if(!food_list.isEmpty())
 		{
 			menu_list=this.getMenuList(food_list);
 			restaurant_list=this.getRestaurantList(menu_list);
@@ -67,28 +71,43 @@ public class FoodSearchService implements FoodSearchServiceInterface{
 			restaurant_list=this.getRestaurantList(menu_list);
 		}
 		restaurant_list=get_restaurant_with_distance(restaurant_list,food_form_ui.getLatitude(),food_form_ui.getLongitude(),distance);
-		int i;
-		food_iterator=food_list.iterator();
 		
-		while(food_iterator.hasNext())
+		//Iterator for Food Objects-Food_List
+		List<Object> object_list_food=new ArrayList<Object>();
+		for(i=0;i<food_list.size();i++)
+			object_list_food.add(food_list.get(i));
+		Repository food_repo=new Repository(object_list_food);
+		
+		//Iterator for Menu Objects-Menu List
+		List<Object> object_list_menu=new ArrayList<Object>();
+		for(i=0;i<menu_list.size();i++)
+			object_list_menu.add(menu_list.get(i));
+		Repository menu_repo=new Repository(object_list_menu);
+		
+		//Iterator for Restaurant Objects-Restaurant List
+		List<Object> object_list_restaurant=new ArrayList<Object>();
+		for(i=0;i<restaurant_list.size();i++)
+			object_list_restaurant.add(restaurant_list.get(i));
+		Repository restaurant_repo=new Repository(object_list_restaurant);
+		
+		
+		for(IteratorInterface iter_food=food_repo.getIterator();iter_food.hasNext();)
 		{
 			Food_Form food_form_object=new Food_Form();
-			Food food_object=food_iterator.next();
+			Food food_object=(Food)iter_food.next();
 			
 			menu_id=(String)food_object.getMenu_id();
-			menu_iterator=menu_list.iterator();
-			restaurant_iterator=restaurant_list.iterator();	
-			while(menu_iterator.hasNext())
+			for(IteratorInterface iter_menu=menu_repo.getIterator();iter_menu.hasNext();)
 			{
-				Menu menu_object=menu_iterator.next();
+				Menu menu_object=(Menu)iter_menu.next();
 				if(menu_object.getMenu_id().equals(menu_id))
 				{
 					restaurant_id=menu_object.getRestaurant_id();
 					
-					while(restaurant_iterator.hasNext())
+					for(IteratorInterface iter_restaurant=restaurant_repo.getIterator();iter_restaurant.hasNext();)
 					{
 						Timestamp ts=new Timestamp(System.currentTimeMillis());
-						Restaurant restaurant_object=restaurant_iterator.next();
+						Restaurant restaurant_object=(Restaurant)iter_restaurant.next();
 						if(restaurant_object.getRestaurant_id().equals(restaurant_id))
 						{
 							food_form_object.setRestaurant_id(restaurant_object.getRestaurant_id());

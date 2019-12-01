@@ -1,8 +1,7 @@
 package com.fagito.model;
 
-import java.util.Calendar;
-import java.util.Date;
 
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -16,7 +15,7 @@ public class Customer
 	private String customer_name;
 	private int is_gold;
 	private Date validity;
-	private int subscribe;
+	private String usertype;
 	
 	
 	
@@ -26,11 +25,12 @@ public class Customer
 	public void setValidity(Date validity) {
 		this.validity = validity;
 	}
-	public int getSubscribe() {
-		return subscribe;
+	
+	public String getUsertype() {
+		return usertype;
 	}
-	public void setSubscribe(int subscribe) {
-		this.subscribe = subscribe;
+	public void setUsertype(String usertype) {
+		this.usertype = usertype;
 	}
 	public String getCustomer_id() {
 		return customer_id;

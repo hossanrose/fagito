@@ -14,4 +14,7 @@ public interface RestaurantRecordRepository extends JpaRepository<RestaurantReco
 	
 	@Query(value="SELECT * FROM restaurant_record rr where rr.restaurant_id=:restaurant_id",nativeQuery=true)
 	RestaurantRecord findRestaurantRecord(@Param("restaurant_id")String restaurant_id);
+	
+	@Query(value="SELECT r.restaurant_id FROM restaurant_record r ORDER BY r.restaurant_id DESC LIMIT 1",nativeQuery=true)
+	String findLastRecord();
 }

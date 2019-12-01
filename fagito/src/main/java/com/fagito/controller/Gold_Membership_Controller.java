@@ -3,7 +3,6 @@ package com.fagito.controller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,7 @@ public class Gold_Membership_Controller {
 	@Autowired
 	private RegisterService register_service;
 	
-	@PostMapping
+	@PostMapping("/register")
 	public ResponseEntity<?> register_membership(@RequestBody Payment_Gold_UI payment_gold_ui)
 	{
 		try

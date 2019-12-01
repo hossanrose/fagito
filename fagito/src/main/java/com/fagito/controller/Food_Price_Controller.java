@@ -3,6 +3,7 @@ package com.fagito.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,12 +21,18 @@ public class Food_Price_Controller {
 	@Autowired
 	private FoodPriceService food_price_service;
 	//get food discount price
-	@PostMapping
-	public Food_Price food_price_search(@RequestBody Food_Price_UI food_price_ui)
+	@PostMapping("/specific_food")
+	public ResponseEntity<?> food_price_search(@RequestBody Food_Price_UI food_price_ui)
 	{
-		return food_price_service.get_food_details(food_price_ui);
+		try {
+			return ResponseEntity.ok().body(food_price_service.get_food_details(food_price_ui));
+		}
+		catch(Exception e)
+		{
+			return ResponseEntity.status(500).body(e.getMessage());
+		}
 	}
-	//get all food discounts based on user id
+	//get all food discounts based on user id front end has to be made
 	@PostMapping("/{customer_id}")
 	public List<Food_Price> all_food_price_search(@PathVariable String customer_id)
 	{

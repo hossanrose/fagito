@@ -1,10 +1,8 @@
 package com.fagito.validator;
 
 import java.util.regex.Pattern;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
 import com.fagito.dto.*;
 
@@ -15,6 +13,7 @@ public class UserValidator
 	String errorEmail;
 	@Value("${spring.user.password}")
 	String errorPassword;
+	//validating signup details
 	public String validate(SignUpDTO signupDTO)
 	{
 		if(checkEmail(signupDTO.getEmail()))

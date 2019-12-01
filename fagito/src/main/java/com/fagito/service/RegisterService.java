@@ -1,14 +1,12 @@
 package com.fagito.service;
 
-import java.text.SimpleDateFormat;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import com.fagito.dto.PaymentGoldDTO;
 import com.fagito.model.Customer;
 import com.fagito.model.PaymentGold;
@@ -16,13 +14,14 @@ import com.fagito.repository.CustomerRepository;
 import com.fagito.repository.PaymentGoldRepository;
 
 @Service
-public class RegisterService {
+public class RegisterService{
 
 	@Autowired
 	private PaymentGoldRepository payment_gold_repository;
 	@Autowired
 	private CustomerRepository customerRepository;
 
+	private ArrayList<Observer> observers;
 	@Value("${spring.user.gold.success}")
 	String successRegister;
 	@Value("${spring.user.gold.payment.fail}")
@@ -31,6 +30,7 @@ public class RegisterService {
 	@SuppressWarnings("deprecation")
 	public String set_membership(PaymentGoldDTO paymentgoldDTO) throws Exception {
 		
+			
 			PaymentGold payment_gold = new PaymentGold();
 			String pay_id = payment_gold_repository.findLastRecord();
 			String result;
@@ -49,9 +49,11 @@ public class RegisterService {
 				cal.set(Calendar.MONTH, cal.getTime().getMonth() + paymentgoldDTO.getMonths());
 				Date date = new Date(cal.getTimeInMillis());
 				customer_object.setValidity(date);
-				customer_object.setSubscribe(paymentgoldDTO.getSubscribe());
-
+                customer_object.setIs_gold(1);
+                
 				customerRepository.save(customer_object);
+				
+				
 
 				return successRegister;
 			} else {
