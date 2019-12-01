@@ -4,6 +4,8 @@ resources:
     source:  
       uri: https://github.com/hossanrose/fagito.git
       branch: master
+      username: ((USER))
+      password: ((PASS))
   - name: storage
     type: s3
     source:
