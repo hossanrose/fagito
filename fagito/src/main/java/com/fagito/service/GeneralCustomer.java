@@ -1,6 +1,9 @@
+
 package com.fagito.service;
 
 import com.fagito.model.Customer_Discount;
+package com.fagito.model;
+
 
 public class GeneralCustomer extends Customer_Discount {
 	

@@ -1,4 +1,4 @@
-package com.fagito.service;
+ackage com.fagito.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,5 +29,3 @@ public class AdminService_AddorDeleteRestaurant {
 		return adminservice_switch.switchService(add_Restaurant_UI);
 	}
 }
-
-

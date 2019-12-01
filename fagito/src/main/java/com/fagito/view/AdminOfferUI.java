@@ -20,6 +20,4 @@ public class AdminOfferUI {
 		this.gold_per = gold_per;
 	}
 	
-	
-
 }
